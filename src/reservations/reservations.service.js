@@ -2,10 +2,17 @@ const knex = require("../db/connection");
 
 const tableName = "reservations";
 
-function list(date) {
-  return knex(tableName)
-    .where("reservation_date", date)
-    .whereNotIn("status", ["finished", "cancelled"])
+function list() {
+  return knex("reservations")
+    .select("*")
+    .orderBy("reservation_date")
+    .orderBy("reservation_time");
+}
+function listByDate(date) {
+  return knex("reservations")
+    .select("reservations.*")
+    .where({ reservation_date: date })
+    .whereNot({ status: "finished" })
     .orderBy("reservation_time");
 }
 
@@ -15,10 +22,8 @@ function create(reservation) {
     .then((createdReservations) => createdReservations[0]);
 }
 
-function read(reservation_id){
-    return knex(tableName)
-      .where("reservation_id", reservation_id)
-      .first();
+function read(reservation_id) {
+  return knex(tableName).where("reservation_id", reservation_id).first();
 }
 
 function update(reservation) {
@@ -29,17 +34,17 @@ function update(reservation) {
 }
 
 function status(reservation) {
-    update(reservation);
-    return validStatus(reservation);
+  update(reservation);
+  return validStatus(reservation);
 }
 
 function validStatus(reservation) {
-  if (["booked", "seated", "finished", "cancelled"].includes(reservation.status)) {
+  if (
+    ["booked", "seated", "finished", "cancelled"].includes(reservation.status)
+  ) {
     return reservation;
   }
-  const error = new Error(
-    `Invalid status:"${reservation.status}"`
-  );
+  const error = new Error(`Invalid status:"${reservation.status}"`);
   error.status = 400;
   throw error;
 }
@@ -56,7 +61,8 @@ function search(mobile_number) {
 module.exports = {
   create,
   list,
+  listByDate,
   read,
   status,
-  search
+  search,
 };
