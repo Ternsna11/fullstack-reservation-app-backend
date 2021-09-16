@@ -86,8 +86,7 @@ function isValidDate(req, res, next) {
   let newDate = new Date(
     `${req.body.data.reservation_date} ${req.body.data.reservation_time}`
   );
-  console.log(reservation_date);
-  console.log(newDate);
+  
   if (isNaN(Date.parse(data["reservation_date"]))) {
     return next({ status: 400, message: `Invalid reservation_date` });
   }
