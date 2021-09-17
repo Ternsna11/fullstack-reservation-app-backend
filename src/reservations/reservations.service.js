@@ -3,19 +3,19 @@ const knex = require("../db/connection");
 const tableName = "reservations";
 
 function list() {
-  return knex("reservations")
+  return knex(tableName)
     .select("*")
     .orderBy("reservation_date")
     .orderBy("reservation_time");
 }
 function listByDate(date) {
-  return knex("reservations")
-    .select("reservations.*")
+  return knex(tableName)
+    .select('*')
     .where({ reservation_date: date })
-    .whereNot({ status: "finished" })
-    .orderBy("reservation_time");
+    .whereNot({ status: 'finished' })
+    .whereNot({ status: 'cancelled' })
+    .orderBy('reservation_time');
 }
-
 function create(reservation) {
   return knex(tableName)
     .insert(reservation, "*")
