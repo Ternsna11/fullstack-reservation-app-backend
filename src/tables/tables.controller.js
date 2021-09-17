@@ -1,22 +1,6 @@
 const service = require("./tables.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
-function hasValidFields(req, res, next) {
-  const { data = {} } = req.body;
-  const validFields = new Set(["table_name", "capacity"]);
-
-  const invalidFields = Object.keys(data).filter(
-    (field) => !validFields.has(field)
-  );
-
-  if (invalidFields.length)
-    return next({
-      status: 400,
-      message: `Invalid field(s): ${invalidFields.join(", ")}`,
-    });
-  next();
-}
-
 function hasTableId(req, res, next) {
   const table = req.params.table_id;
   if (table) {
@@ -95,17 +79,6 @@ function hasCapacity(req, res, next) {
     next();
   }
 }
-// const validTable = async (req, res, next) => {
-//   const { table_id } = req.params;
-//   const table = await service.read(Number(table_id));
-//   const reservated = res.locals.reservation;
-//   if (table[0].occupied || reservated.people > table[0].capacity)
-//     return next({
-//       status: 400,
-//       message: ` Table is over capacity or occupied`,
-//     });
-//   next();
-// };
 
 async function seat(req, res) {
   const data = await service.seat(
@@ -174,7 +147,6 @@ module.exports = {
     has_capacity,
     isValidTableName,
     isValidNumber,
-    //      hasValidFields,
     asyncErrorBoundary(create),
   ],
   read: [hasTableId, asyncErrorBoundary(read)],
